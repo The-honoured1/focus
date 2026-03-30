@@ -1,0 +1,162 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import '../widgets/premium_background.dart';
+import '../widgets/duration_picker_3d.dart';
+import 'package:focus/core/theme.dart';
+import '../../features/focus/focus_provider.dart';
+import 'session_screen.dart';
+
+class CreateFocusScreen extends ConsumerStatefulWidget {
+  const CreateFocusScreen({super.key});
+
+  @override
+  ConsumerState<CreateFocusScreen> createState() => _CreateFocusScreenState();
+}
+
+class _CreateFocusScreenState extends ConsumerState<CreateFocusScreen> {
+  final TextEditingController _nameController = TextEditingController(text: 'Read Game of thrones');
+  int _selectedMinutes = 60;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: PremiumBackground(
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24.0),
+            child: Column(
+              children: [
+                const SizedBox(height: 20),
+                Center(
+                  child: Text(
+                    'Create new focus',
+                    style: GoogleFonts.inter(
+                      color: Colors.white54,
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+                const Spacer(flex: 1),
+                
+                // Focus Name Input
+                Text(
+                  'Focus name',
+                  style: GoogleFonts.inter(color: Colors.white24, fontSize: 14),
+                ),
+                const SizedBox(height: 12),
+                IntrinsicWidth(
+                  child: TextField(
+                    controller: _nameController,
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.playfairDisplay(
+                      fontSize: 32,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    decoration: const InputDecoration(
+                      border: InputBorder.none,
+                      hintText: 'Enter name...',
+                      hintStyle: TextStyle(color: Colors.white10),
+                    ),
+                  ),
+                ).animate().fadeIn().scale(),
+                
+                const Spacer(flex: 1),
+                
+                // Duration Picker
+                Text(
+                  'Focus time in mins',
+                  style: GoogleFonts.inter(color: Colors.white24, fontSize: 14),
+                ),
+                const SizedBox(height: 24),
+                DurationPicker3D(
+                  onDurationChanged: (value) {
+                    setState(() => _selectedMinutes = value);
+                  },
+                ),
+                
+                const Spacer(flex: 1),
+                
+                // Long term focus option
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: AppColors.glassBackground,
+                    borderRadius: BorderRadius.circular(24),
+                    border: Border.all(color: AppColors.border),
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Create a long term focus',
+                              style: GoogleFonts.inter(color: Colors.white, fontWeight: FontWeight.bold),
+                            ),
+                            Text(
+                              'Add repeat, due date and more',
+                              style: GoogleFonts.inter(color: Colors.white38, fontSize: 12),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.1),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(Icons.north_east_rounded, size: 16),
+                      ),
+                    ],
+                  ),
+                ).animate().fadeIn(delay: 200.ms).slideY(begin: 0.2),
+                
+                const SizedBox(height: 40),
+                
+                // Action Buttons
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () {},
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 20),
+                          side: const BorderSide(color: Colors.white24),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(100)),
+                        ),
+                        child: Text(
+                          'Create with Laura',
+                          style: GoogleFonts.inter(color: AppColors.primary, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: FilledButton(
+                        onPressed: () {
+                          ref.read(focusProvider.notifier).startSession(_selectedMinutes);
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(builder: (context) => const SessionScreen()),
+                          );
+                        },
+                        child: const Text('Continue'),
+                      ),
+                    ),
+                  ],
+                ).animate().fadeIn(delay: 400.ms),
+                
+                const SizedBox(height: 20),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
