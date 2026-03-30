@@ -1,0 +1,69 @@
+import 'dart:convert';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+class Todo {
+  final String id;
+  final String title;
+  final bool isCompleted;
+
+  Todo({required this.id, required this.title, this.isCompleted = false});
+
+  Map<String, dynamic> toJson() => {'id': id, 'title': title, 'isCompleted': isCompleted};
+
+  factory Todo.fromJson(Map<String, dynamic> json) => Todo(
+        id: json['id'],
+        title: json['title'],
+        isCompleted: json['isCompleted'],
+      );
+}
+
+class TodoNotifier extends StateNotifier<List<Todo>> {
+  TodoNotifier() : super([]) {
+    _loadTodos();
+  }
+
+  Future<void> _loadTodos() async {
+    final prefs = await SharedPreferences.getInstance();
+    final jsonString = prefs.getString('todos');
+    if (jsonString != null) {
+      final List<dynamic> jsonList = jsonDecode(jsonString);
+      state = jsonList.map((e) => Todo.fromJson(e)).toList();
+    }
+  }
+
+  Future<void> _saveTodos() async {
+    final prefs = await SharedPreferences.getInstance();
+    final jsonList = state.map((t) => t.toJson()).toList();
+    await prefs.setString('todos', jsonEncode(jsonList));
+  }
+
+  void addTodo(String title) {
+    if (title.trim().isEmpty) return;
+    final newTodo = Todo(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      title: title,
+    );
+    state = [...state, newTodo];
+    _saveTodos();
+  }
+
+  void toggleTodo(String id) {
+    state = state.map((todo) {
+      if (todo.id == id) {
+        return Todo(id: todo.id, title: todo.title, isCompleted: !todo.isCompleted);
+      }
+      return todo;
+    }).toList();
+    _saveTodos();
+  }
+
+  void deleteTodo(String id) {
+    state = state.where((todo) => todo.id != id).toList();
+    _saveTodos();
+  }
+}
+
+final todoProvider = StateNotifierProvider<TodoNotifier, List<Todo>>((ref) {
+  return TodoNotifier();
+});
