@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../core/theme.dart';
 import 'block_apps_screen.dart';
 import 'about_screen.dart';
@@ -85,12 +86,22 @@ class SettingsScreen extends StatelessWidget {
             child: const Text('Close', style: TextStyle(color: Colors.white54)),
           ),
           FilledButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Send Email'),
+            onPressed: () {
+              Navigator.pop(context);
+              _launchURL('https://forms.gle/focus-plus-support');
+            },
+            child: const Text('Open Help Center'),
           ),
         ],
       ),
     );
+  }
+
+  Future<void> _launchURL(String url) async {
+    final Uri uri = Uri.parse(url);
+    if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+      debugPrint('Could not launch $url');
+    }
   }
 
   Widget _buildSettingsItem(BuildContext context, {required IconData icon, required String title, required String subtitle, required VoidCallback onTap, Color? iconColor}) {
