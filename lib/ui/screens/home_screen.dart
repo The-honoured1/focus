@@ -8,13 +8,17 @@ import '../../features/dnd/passive_blocking_provider.dart';
 import '../../features/navigation/navigation_provider.dart';
 import '../../features/focus/daily_goal_provider.dart';
 import '../../features/dnd/block_apps_provider.dart';
+import '../../features/focus/focus_provider.dart';
 
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme.dart';
+import '../../features/user/user_provider.dart';
+import '../../features/todo/todo_provider.dart';
 import 'create_focus_screen.dart';
 import 'streak_screen.dart';
 import '../widgets/focus_gauge.dart';
 import '../widgets/premium_background.dart';
+import 'tasks_screen.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -24,6 +28,13 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
+  String _getGreeting() {
+    final hour = DateTime.now().hour;
+    if (hour < 12) return 'Good Morning';
+    if (hour < 17) return 'Good Afternoon';
+    return 'Good Evening';
+  }
+
   @override
   void initState() {
     super.initState();
@@ -34,6 +45,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final streak = ref.watch(streakProvider);
     final passiveState = ref.watch(passiveBlockingProvider);
     final dailyGoal = ref.watch(dailyGoalProvider);
+    final userState = ref.watch(userProvider);
+    final todos = ref.watch(todoProvider);
+    final focusState = ref.watch(focusProvider);
+
+    final isSessionRunning = focusState.status == FocusStatus.running;
+
+    // Filter today's incomplete tasks
+    final todayTasks = todos.where((t) => !t.isCompleted).take(2).toList();
 
     // Combine focus session minutes + passive blocking minutes for today
     final focusMinutes = ref.read(sessionHistoryProvider.notifier).getTodayFocusMinutes();
@@ -46,57 +65,27 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24.0),
             child: CustomScrollView(
+              physics: const BouncingScrollPhysics(),
               slivers: [
                 SliverToBoxAdapter(
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const SizedBox(height: 20),
-                      Text(
-                        'FOCUS+',
-                        style: GoogleFonts.inter(
-                          color: AppColors.primary,
-                          fontSize: 12,
-                          letterSpacing: 8,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ).animate().fadeIn(),
-                      const SizedBox(height: 12),
-                      
-                      GestureDetector(
-                        onTap: () => _showGoalDialog(context, dailyGoal),
-                        child: FocusGauge(
-                          currentMinutes: totalMinutesToday,
-                          goalMinutes: dailyGoal,
-                        ),
-                      ),
-                      
-                      const SizedBox(height: 20),
-                      GestureDetector(
-                        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const StreakScreen())),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.local_fire_department, color: AppColors.primary, size: 20),
-                            const SizedBox(width: 8),
-                            Text(
-                              '${streak.currentStreak} DAY STREAK',
-                              style: GoogleFonts.inter(
-                                color: Colors.white70,
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                                letterSpacing: 1,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ).animate().fadeIn(delay: 500.ms),
+                      const SizedBox(height: 24),
+                      _buildHeader(userState.name),
                       const SizedBox(height: 32),
-
-                      // Passive Blocking Card
+                      _buildProductivityHub(totalMinutesToday, dailyGoal, streak.currentStreak),
+                      const SizedBox(height: 32),
+                      isSessionRunning 
+                        ? _buildActiveFocusCard(focusState)
+                        : _buildStartFocusCard(),
+                      const SizedBox(height: 32),
+                      if (todayTasks.isNotEmpty) ...[
+                        _buildPrioritiesSection(todayTasks),
+                        const SizedBox(height: 32),
+                      ],
                       _buildPassiveBlockingCard(passiveState),
-                      
-                      const SizedBox(height: 32),
+                      const SizedBox(height: 40),
                     ],
                   ),
                 ),
@@ -105,26 +94,319 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
         ),
       ),
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.only(bottom: 80.0),
-        child: FloatingActionButton.extended(
-          onPressed: () => Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const CreateFocusScreen()),
+    );
+  }
+
+  Widget _buildHeader(String name) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              _getGreeting(),
+              style: GoogleFonts.inter(
+                color: Colors.white54,
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            Text(
+              name.isNotEmpty ? name : 'Focus Friend',
+              style: GoogleFonts.playfairDisplay(
+                color: Colors.white,
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+        Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.05),
+            shape: BoxShape.circle,
+            border: Border.all(color: AppColors.border),
           ),
-          backgroundColor: Colors.white,
-          foregroundColor: Colors.black,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(100)),
-          label: Row(
+          child: Icon(Icons.person_outline, color: AppColors.primary, size: 24),
+        ),
+      ],
+    ).animate().fadeIn().slideX(begin: -0.1, end: 0);
+  }
+
+  Widget _buildProductivityHub(int current, int goal, int streak) {
+    return GestureDetector(
+      onTap: () => _showGoalDialog(context, goal),
+      child: Container(
+        padding: const EdgeInsets.all(24),
+        decoration: AppTheme.glassDecoration,
+        child: Row(
+          children: [
+            FocusGauge(
+              currentMinutes: current,
+              goalMinutes: goal,
+              size: 100,
+              showInfo: false,
+            ),
+            const SizedBox(width: 24),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'DAILY PROGRESS',
+                    style: GoogleFonts.inter(
+                      color: AppColors.primary,
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1.5,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    '$current / $goal mins',
+                    style: GoogleFonts.inter(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Icon(Icons.local_fire_department, color: AppColors.primary, size: 16),
+                      const SizedBox(width: 4),
+                      Text(
+                        '$streak DAY STREAK',
+                        style: GoogleFonts.inter(
+                          color: Colors.white70,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            Icon(Icons.chevron_right, color: Colors.white24),
+          ],
+        ),
+      ).animate().fadeIn(delay: 200.ms).scale(begin: const Offset(0.95, 0.95), end: const Offset(1, 1)),
+    );
+  }
+
+  Widget _buildActiveFocusCard(FocusState state) {
+    final minutes = (state.remainingSeconds ~/ 60).toString().padLeft(2, '0');
+    final seconds = (state.remainingSeconds % 60).toString().padLeft(2, '0');
+    final progress = state.totalSeconds > 0 ? (state.totalSeconds - state.remainingSeconds) / state.totalSeconds : 0.0;
+
+    return GestureDetector(
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const SessionScreen()),
+      ),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          color: AppColors.primary.withOpacity(0.08),
+          borderRadius: BorderRadius.circular(32),
+          border: Border.all(color: AppColors.primary.withOpacity(0.5), width: 2),
+        ),
+        child: Row(
+          children: [
+            Stack(
+              alignment: Alignment.center,
+              children: [
+                SizedBox(
+                  width: 60,
+                  height: 60,
+                  child: CircularProgressIndicator(
+                    value: progress,
+                    strokeWidth: 4,
+                    color: AppColors.primary,
+                    backgroundColor: Colors.white.withOpacity(0.05),
+                    strokeCap: StrokeCap.round,
+                  ),
+                ),
+                Icon(Icons.timer_outlined, color: AppColors.primary, size: 20),
+              ],
+            ),
+            const SizedBox(width: 20),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'SESSION IN PROGRESS',
+                    style: GoogleFonts.inter(
+                      color: AppColors.primary,
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Focusing...',
+                    style: GoogleFonts.playfairDisplay(
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(
+                  '$minutes:$seconds',
+                  style: GoogleFonts.inter(
+                    color: Colors.white,
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(
+                  'REMAINING',
+                  style: GoogleFonts.inter(
+                    color: Colors.white38,
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ).animate(onPlay: (c) => c.repeat(reverse: true))
+       .shimmer(duration: 2.seconds, color: AppColors.primary.withOpacity(0.1)),
+    );
+  }
+
+  Widget _buildStartFocusCard() {
+    return GestureDetector(
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const CreateFocusScreen()),
+      ),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(32),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              AppColors.primary.withOpacity(0.15),
+              AppColors.accent.withOpacity(0.05),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(32),
+          border: Border.all(color: AppColors.primary.withOpacity(0.3)),
+        ),
+        child: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: AppColors.primary,
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.primary.withOpacity(0.3),
+                    blurRadius: 20,
+                    spreadRadius: 5,
+                  ),
+                ],
+              ),
+              child: const Icon(Icons.play_arrow_rounded, color: Colors.black, size: 32),
+            ),
+            const SizedBox(height: 20),
+            Text(
+              'Ready to focus?',
+              style: GoogleFonts.playfairDisplay(
+                color: Colors.white,
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Start a deep work session now',
+              style: GoogleFonts.inter(
+                color: Colors.white54,
+                fontSize: 14,
+              ),
+            ),
+          ],
+        ),
+      ).animate().fadeIn(delay: 400.ms).slideY(begin: 0.1, end: 0),
+    );
+  }
+
+  Widget _buildPrioritiesSection(List<Todo> tasks) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'TODAY\'S PRIORITIES',
+              style: GoogleFonts.inter(
+                color: Colors.white38,
+                fontSize: 11,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 1.5,
+              ),
+            ),
+            GestureDetector(
+              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const TasksScreen())),
+              child: Text(
+                'SEE ALL',
+                style: GoogleFonts.inter(
+                  color: AppColors.primary,
+                  fontSize: 11,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        ...tasks.map((task) => Container(
+          margin: const EdgeInsets.only(bottom: 12),
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.03),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: AppColors.border),
+          ),
+          child: Row(
             children: [
-              const Icon(Icons.add, size: 20),
-              const SizedBox(width: 8),
-              Text('New focus', style: GoogleFonts.inter(fontWeight: FontWeight.bold)),
+              Icon(Icons.radio_button_unchecked, color: AppColors.primary, size: 20),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  task.title,
+                  style: GoogleFonts.inter(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w500),
+                ),
+              ),
+              if (task.alarmTime != null)
+                Text(
+                  task.alarmTime!,
+                  style: GoogleFonts.inter(color: Colors.white38, fontSize: 12),
+                ),
             ],
           ),
-        ).animate().scale(delay: 600.ms),
-      ),
-    );
+        )).toList(),
+      ],
+    ).animate().fadeIn(delay: 600.ms);
   }
 
   void _showGoalDialog(BuildContext context, int currentGoal) {

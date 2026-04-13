@@ -7,11 +7,15 @@ import 'dart:math' as math;
 class FocusGauge extends StatelessWidget {
   final int currentMinutes;
   final int goalMinutes;
+  final double size;
+  final bool showInfo;
 
   const FocusGauge({
     super.key,
     required this.currentMinutes,
     required this.goalMinutes,
+    this.size = 200,
+    this.showInfo = true,
   });
 
   @override
@@ -20,8 +24,7 @@ class FocusGauge extends StatelessWidget {
     final int remaining = math.max(0, goalMinutes - currentMinutes);
 
     return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 40),
+      padding: showInfo ? const EdgeInsets.symmetric(vertical: 20) : EdgeInsets.zero,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -30,8 +33,8 @@ class FocusGauge extends StatelessWidget {
             children: [
               // Outer Glow
               Container(
-                width: 220,
-                height: 220,
+                width: size + 20,
+                height: size + 20,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   boxShadow: [
@@ -46,11 +49,11 @@ class FocusGauge extends StatelessWidget {
               
               // Progress Ring
               SizedBox(
-                width: 200,
-                height: 200,
+                width: size,
+                height: size,
                 child: CircularProgressIndicator(
                   value: progress,
-                  strokeWidth: 4,
+                  strokeWidth: showInfo ? 4 : 3,
                   color: AppColors.primary,
                   backgroundColor: Colors.white.withOpacity(0.05),
                   strokeCap: StrokeCap.round,
@@ -61,20 +64,21 @@ class FocusGauge extends StatelessWidget {
               Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(
-                    'FOCUS TODAY',
-                    style: GoogleFonts.inter(
-                      color: Colors.white24,
-                      fontSize: 10,
-                      letterSpacing: 2,
+                  if (showInfo)
+                    Text(
+                      'FOCUS TODAY',
+                      style: GoogleFonts.inter(
+                        color: Colors.white24,
+                        fontSize: size * 0.05,
+                        letterSpacing: 2,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 8),
+                  if (showInfo) const SizedBox(height: 8),
                   Text(
                     '$currentMinutes',
                     style: GoogleFonts.playfairDisplay(
                       color: Colors.white,
-                      fontSize: 48,
+                      fontSize: size * 0.24,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -82,7 +86,7 @@ class FocusGauge extends StatelessWidget {
                     'MINS',
                     style: GoogleFonts.inter(
                       color: Colors.white54,
-                      fontSize: 12,
+                      fontSize: size * 0.06,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -90,15 +94,17 @@ class FocusGauge extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 32),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              _infoTile('Remaining', '$remaining mins'),
-              Container(width: 1, height: 20, color: Colors.white10, margin: const EdgeInsets.symmetric(horizontal: 24)),
-              _infoTile('Goal', '$goalMinutes mins'),
-            ],
-          ),
+          if (showInfo) ...[
+            const SizedBox(height: 32),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                _infoTile('Remaining', '$remaining mins'),
+                Container(width: 1, height: 20, color: Colors.white10, margin: const EdgeInsets.symmetric(horizontal: 24)),
+                _infoTile('Goal', '$goalMinutes mins'),
+              ],
+            ),
+          ],
         ],
       ),
     );
