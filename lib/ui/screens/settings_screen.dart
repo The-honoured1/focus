@@ -45,8 +45,50 @@ class SettingsScreen extends StatelessWidget {
               iconColor: AppColors.primary,
               onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const DonateScreen())),
             ),
+            const SizedBox(height: 16),
+            _buildSettingsItem(
+              context, 
+              icon: Icons.alternate_email_rounded, 
+              title: 'Contact Support', 
+              subtitle: 'Get help or report a bug',
+              onTap: () => _showContactDialog(context),
+            ),
+            const SizedBox(height: 16),
+            _buildSettingsItem(
+              context, 
+              icon: Icons.shield_outlined, 
+              title: 'Privacy Policy', 
+              subtitle: 'How we handle your data',
+              onTap: () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Opening privacy policy...')),
+                );
+              },
+            ),
           ],
         ),
+      ),
+    );
+  }
+
+  void _showContactDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: AppColors.cardBackground,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24), borderSide: const BorderSide(color: AppColors.border)),
+        title: Text('Contact Us', style: GoogleFonts.playfairDisplay(color: Colors.white, fontWeight: FontWeight.bold)),
+        content: Text('Found a bug or have a suggestion?\n\nContact us at:\nsupport@focusplus.app', style: GoogleFonts.inter(color: Colors.white70)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Close', style: TextStyle(color: Colors.white54)),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Send Email'),
+          ),
+        ],
       ),
     );
   }

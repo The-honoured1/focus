@@ -43,7 +43,8 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final todos = ref.watch(todoProvider);
+    final allTodos = ref.watch(todoProvider);
+    final todos = allTodos.where((todo) => _isSameDay(todo.date, _selectedDate)).toList();
 
     return Scaffold(
       body: PremiumBackground(
@@ -135,7 +136,10 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
                       icon: const Icon(Icons.add_circle, color: AppColors.primary),
                       onPressed: () {
                         if (_taskController.text.trim().isNotEmpty) {
-                          ref.read(todoProvider.notifier).addTodo(_taskController.text.trim());
+                          ref.read(todoProvider.notifier).addTodo(
+                            _taskController.text.trim(),
+                            date: _selectedDate,
+                          );
                           _taskController.clear();
                         }
                       },
@@ -143,7 +147,10 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
                   ),
                   onSubmitted: (val) {
                     if (val.trim().isNotEmpty) {
-                      ref.read(todoProvider.notifier).addTodo(val.trim());
+                      ref.read(todoProvider.notifier).addTodo(
+                        val.trim(),
+                        date: _selectedDate,
+                      );
                       _taskController.clear();
                     }
                   },

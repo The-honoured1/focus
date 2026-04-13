@@ -6,15 +6,27 @@ class Todo {
   final String id;
   final String title;
   final bool isCompleted;
+  final DateTime date;
 
-  Todo({required this.id, required this.title, this.isCompleted = false});
+  Todo({
+    required this.id, 
+    required this.title, 
+    required this.date,
+    this.isCompleted = false,
+  });
 
-  Map<String, dynamic> toJson() => {'id': id, 'title': title, 'isCompleted': isCompleted};
+  Map<String, dynamic> toJson() => {
+    'id': id, 
+    'title': title, 
+    'isCompleted': isCompleted,
+    'date': date.toIso8601String(),
+  };
 
   factory Todo.fromJson(Map<String, dynamic> json) => Todo(
         id: json['id'],
         title: json['title'],
         isCompleted: json['isCompleted'],
+        date: json['date'] != null ? DateTime.parse(json['date']) : DateTime.now(),
       );
 }
 
@@ -38,11 +50,12 @@ class TodoNotifier extends StateNotifier<List<Todo>> {
     await prefs.setString('todos', jsonEncode(jsonList));
   }
 
-  void addTodo(String title) {
+  void addTodo(String title, {DateTime? date}) {
     if (title.trim().isEmpty) return;
     final newTodo = Todo(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       title: title,
+      date: date ?? DateTime.now(),
     );
     state = [...state, newTodo];
     _saveTodos();
@@ -51,7 +64,12 @@ class TodoNotifier extends StateNotifier<List<Todo>> {
   void toggleTodo(String id) {
     state = state.map((todo) {
       if (todo.id == id) {
-        return Todo(id: todo.id, title: todo.title, isCompleted: !todo.isCompleted);
+        return Todo(
+          id: todo.id, 
+          title: todo.title, 
+          isCompleted: !todo.isCompleted,
+          date: todo.date,
+        );
       }
       return todo;
     }).toList();

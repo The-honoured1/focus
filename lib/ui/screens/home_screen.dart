@@ -11,6 +11,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme.dart';
 import '../widgets/premium_background.dart';
 import 'create_focus_screen.dart';
+import '../../features/navigation/navigation_provider.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -144,7 +145,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         final isLarge = index == 0;
                         final duration = (reversedSessions[index].durationSeconds ~/ 60).toString();
                         final title = reversedSessions[index].outputText.isEmpty ? 'Focus Session' : reversedSessions[index].outputText;
-                        return _buildFocusCard(context, duration, title, isLarge: isLarge);
+                        return InkWell(
+                          onTap: () => ref.read(navigationProvider.notifier).state = 2,
+                          borderRadius: BorderRadius.circular(24),
+                          child: _buildFocusCard(context, duration, title, isLarge: isLarge),
+                        );
                       },
                       childCount: sessions.length > 4 ? 4 : sessions.length,
                     ),

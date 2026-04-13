@@ -55,8 +55,29 @@ class _BlockAppsScreenState extends ConsumerState<BlockAppsScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Select the apps you want to block during your focus sessions.\n(Native blocking will enforce this selection)',
+                'Select the apps you want to block during your focus sessions.',
                 style: GoogleFonts.inter(color: Colors.white70, fontSize: 14),
+              ),
+              const SizedBox(height: 16),
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: AppColors.error.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: AppColors.error.withOpacity(0.3)),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.info_outline_rounded, color: AppColors.error, size: 20),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        'System Note: Native blocking currently enforces a strict protocol. Enabling "Deep Focus" will prioritize blocking major distracting apps globally.',
+                        style: GoogleFonts.inter(color: Colors.white60, fontSize: 12),
+                      ),
+                    ),
+                  ],
+                ),
               ),
               const SizedBox(height: 24),
               Expanded(

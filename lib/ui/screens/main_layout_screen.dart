@@ -8,6 +8,7 @@ import 'stats_screen.dart';
 import 'settings_screen.dart';
 import 'tasks_screen.dart';
 import '../../features/dnd/dnd_service.dart';
+import '../../features/navigation/navigation_provider.dart';
 
 class MainLayoutScreen extends ConsumerStatefulWidget {
   const MainLayoutScreen({super.key});
@@ -17,7 +18,7 @@ class MainLayoutScreen extends ConsumerStatefulWidget {
 }
 
 class _MainLayoutScreenState extends ConsumerState<MainLayoutScreen> {
-  int _currentIndex = 0;
+
 
   @override
   void initState() {
@@ -40,12 +41,14 @@ class _MainLayoutScreenState extends ConsumerState<MainLayoutScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final currentIndex = ref.watch(navigationProvider);
+
     return Scaffold(
       backgroundColor: AppColors.background,
       body: Stack(
         children: [
           IndexedStack(
-            index: _currentIndex,
+            index: currentIndex,
             children: _screens,
           ),
           Positioned(
@@ -69,11 +72,9 @@ class _MainLayoutScreenState extends ConsumerState<MainLayoutScreen> {
                     backgroundColor: Colors.transparent,
                     elevation: 0,
                     type: BottomNavigationBarType.fixed,
-                    currentIndex: _currentIndex,
+                    currentIndex: currentIndex,
                     onTap: (index) {
-                      setState(() {
-                        _currentIndex = index;
-                      });
+                      ref.read(navigationProvider.notifier).state = index;
                     },
                     selectedItemColor: AppColors.primary,
                     unselectedItemColor: Colors.white54,
