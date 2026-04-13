@@ -77,7 +77,7 @@ class SettingsScreen extends StatelessWidget {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: AppColors.cardBackground,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24), borderSide: const BorderSide(color: AppColors.border)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24), side: const BorderSide(color: AppColors.border)),
         title: Text('Contact Us', style: GoogleFonts.playfairDisplay(color: Colors.white, fontWeight: FontWeight.bold)),
         content: Text('Found a bug or have a suggestion?\n\nContact us at:\nsupport@focusplus.app', style: GoogleFonts.inter(color: Colors.white70)),
         actions: [

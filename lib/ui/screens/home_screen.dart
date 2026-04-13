@@ -12,6 +12,7 @@ import '../../core/theme.dart';
 import 'create_focus_screen.dart';
 import 'streak_screen.dart';
 import '../widgets/focus_gauge.dart';
+import '../widgets/premium_background.dart';
 import '../../features/navigation/navigation_provider.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
@@ -25,50 +26,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _checkUserName();
-    });
-  }
-
-  void _checkUserName() {
-    final userNotifier = ref.read(userProvider.notifier);
-    if (!userNotifier.hasSeenOnboarding) {
-      _showNameDialog();
-    }
-  }
-
-  void _showNameDialog() {
-    final controller = TextEditingController();
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) {
-        return AlertDialog(
-          backgroundColor: AppColors.cardBackground,
-          title: Text('Welcome!', style: GoogleFonts.playfairDisplay(color: Colors.white)),
-          content: TextField(
-            controller: controller,
-            style: const TextStyle(color: Colors.white),
-            decoration: const InputDecoration(
-              hintText: 'What is your name?',
-              hintStyle: TextStyle(color: Colors.white38),
-            ),
-          ),
-          actions: [
-            FilledButton(
-              onPressed: () {
-                if (controller.text.trim().isNotEmpty) {
-                  ref.read(userProvider.notifier).setName(controller.text.trim());
-                }
-                ref.read(userProvider.notifier).completeOnboarding();
-                Navigator.pop(context);
-              },
-              child: const Text('Continue'),
-            )
-          ],
-        );
-      },
-    );
   }
 
   @override

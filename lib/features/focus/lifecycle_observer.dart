@@ -13,7 +13,7 @@ class LifecycleObserver extends WidgetsBindingObserver {
       // Strict Mode: Fail session if user leaves the app
       final focusState = ref.read(focusProvider);
       if (focusState.status == FocusStatus.running) {
-        ref.read(focusProvider.notifier).failSession();
+        ref.read(focusProvider.notifier).endSessionEarly();
       }
     }
   }
