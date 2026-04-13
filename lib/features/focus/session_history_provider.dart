@@ -15,7 +15,7 @@ class SessionHistoryNotifier extends StateNotifier<List<SessionModel>> {
     final today = DateTime(now.year, now.month, now.day);
     
     return state
-        .where((s) => s.status == SessionStatus.success && s.startTime.isAfter(today))
+        .where((s) => s.startTime.isAfter(today))
         .fold(0, (sum, s) => sum + (s.durationSeconds ~/ 60));
   }
 }

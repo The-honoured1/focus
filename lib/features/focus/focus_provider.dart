@@ -69,12 +69,12 @@ class FocusNotifier extends StateNotifier<FocusState> {
     state = state.copyWith(status: FocusStatus.success);
   }
 
-  void failSession() {
+  void endSessionEarly() {
     if (state.status != FocusStatus.running) return;
     
     _timer?.cancel();
     _timer = null;
-    state = state.copyWith(status: FocusStatus.failed);
+    state = state.copyWith(status: FocusStatus.failed); // Internally still 'failed' for state logic, but will be saved as 'partial'
   }
 
   void reset() {

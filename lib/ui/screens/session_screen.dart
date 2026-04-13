@@ -42,7 +42,7 @@ class SessionScreen extends ConsumerWidget {
               TextButton(
                 onPressed: () async {
                   await DndService.turnOffDnd();
-                  ref.read(focusProvider.notifier).failSession();
+                  ref.read(focusProvider.notifier).endSessionEarly();
                   if (context.mounted) Navigator.pop(context, true);
                 },
                 child: const Text('Quit', style: TextStyle(color: AppColors.error)),

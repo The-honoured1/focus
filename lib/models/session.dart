@@ -5,9 +5,9 @@ part 'session.g.dart';
 @HiveType(typeId: 0)
 enum SessionStatus {
   @HiveField(0)
-  success,
+  completed,
   @HiveField(1)
-  fail
+  partial
 }
 
 @HiveType(typeId: 1)

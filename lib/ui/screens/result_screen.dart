@@ -40,7 +40,7 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
       startTime: focusState.startTime ?? DateTime.now(),
       endTime: DateTime.now(),
       durationSeconds: focusState.totalSeconds - focusState.remainingSeconds,
-      status: isSuccess ? SessionStatus.success : SessionStatus.fail,
+      status: isSuccess ? SessionStatus.completed : SessionStatus.partial,
       outputText: '', // Removed thought/manual text input
     );
 

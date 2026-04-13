@@ -14,10 +14,9 @@ class StatsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final sessions = ref.watch(sessionHistoryProvider);
     final totalFocusTime = sessions
-        .where((s) => s.status == SessionStatus.success)
         .fold(0, (sum, s) => sum + s.durationSeconds);
     
-    final successfulSessions = sessions.where((s) => s.status == SessionStatus.success).length;
+    final successfulSessions = sessions.where((s) => s.status == SessionStatus.completed).length;
     final streak = ref.watch(streakProvider).currentStreak;
 
     return Scaffold(
@@ -66,7 +65,7 @@ class StatsScreen extends ConsumerWidget {
             delegate: SliverChildBuilderDelegate(
               (context, index) {
                 final session = sessions.reversed.toList()[index];
-                final isSuccess = session.status == SessionStatus.success;
+                final isSuccess = session.status == SessionStatus.completed;
                 final dateStr = DateFormat('MMM dd, HH:mm').format(session.startTime);
 
                 return Container(
@@ -96,7 +95,7 @@ class StatsScreen extends ConsumerWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(isSuccess ? 'Focus Session' : 'Abandoned Session', style: Theme.of(context).textTheme.bodyLarge),
+                            Text(isSuccess ? 'Focus Session' : 'Partial Session', style: Theme.of(context).textTheme.bodyLarge),
                             Text(dateStr, style: Theme.of(context).textTheme.bodySmall),
                           ],
                         ),
