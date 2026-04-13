@@ -45,7 +45,8 @@ class _FocusPlusAppState extends ConsumerState<FocusPlusApp> {
 
   @override
   Widget build(BuildContext context) {
-    final hasSeenOnboarding = ref.watch(userProvider.notifier).hasSeenOnboarding;
+    final userState = ref.watch(userProvider);
+    final hasSeenOnboarding = userState.hasSeenOnboarding;
 
     return MaterialApp(
       title: 'Focus+',

@@ -67,7 +67,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                             color: AppColors.primary.withOpacity(0.05),
                           ),
                           child: Icon(page.icon, size: 80, color: AppColors.primary),
-                        ).animate().scale(delay: 200.ms, duration: 600.ms, curve: Curves.backOut),
+                        ).animate().scale(delay: 200.ms, duration: 600.ms, curve: Curves.easeOutBack),
                         const SizedBox(height: 60),
                         Text(
                           page.title,
@@ -169,7 +169,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       return;
     }
     
-    ref.read(userProvider.notifier).updateName(name);
+    ref.read(userProvider.notifier).setName(name);
     ref.read(userProvider.notifier).completeOnboarding();
   }
 }
