@@ -47,6 +47,8 @@ dependencies:
   app_limiter: ^0.0.1
   installed_apps: ^1.4.3
   url_launcher: ^6.3.1
+  flutter_local_notifications: ^17.1.2
+  timezone: ^0.9.4
 
 dev_dependencies:
   flutter_test:

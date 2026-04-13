@@ -14,7 +14,7 @@ class BlockAppsNotifier extends StateNotifier<List<String>> {
 
   Future<void> _loadBlockedApps() async {
     final prefs = await SharedPreferences.getInstance();
-    final apps = prefs.getStringList(_key) ?? ['Instagram', 'TikTok']; // Default values
+    final apps = prefs.getStringList(_key) ?? []; // Default to empty
     state = apps;
   }
 

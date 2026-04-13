@@ -14,6 +14,8 @@ import 'streak_screen.dart';
 import '../widgets/focus_gauge.dart';
 import '../widgets/premium_background.dart';
 import '../../features/navigation/navigation_provider.dart';
+import '../../features/focus/daily_goal_provider.dart';
+import '../../features/dnd/block_apps_provider.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -39,6 +41,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final focusMinutes = ref.read(sessionHistoryProvider.notifier).getTodayFocusMinutes();
     final passiveMinutes = passiveState.todayPassiveMinutes;
     final totalMinutesToday = focusMinutes + passiveMinutes;
+    final dailyGoal = ref.watch(dailyGoalProvider);
 
     return Scaffold(
       body: PremiumBackground(
@@ -63,7 +66,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       ).animate().fadeIn(),
                       const SizedBox(height: 12),
                       
-                      FocusGauge(currentMinutes: totalMinutesToday),
+                      GestureDetector(
+                        onTap: () => _showGoalDialog(context, dailyGoal),
+                        child: FocusGauge(
+                          currentMinutes: totalMinutesToday,
+                          goalMinutes: dailyGoal,
+                        ),
+                      ),
                       
                       const SizedBox(height: 20),
                       GestureDetector(
@@ -95,67 +104,63 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   ),
                 ),
                 
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.only(bottom: 16.0),
-                    child: Text(
-                      'RECENT SESSIONS', 
-                      style: GoogleFonts.inter(
-                        color: Colors.white24, 
-                        fontSize: 10, 
-                        letterSpacing: 2,
-                        fontWeight: FontWeight.bold
-                      )
-                    ),
-                  ),
-                ),
-                SliverPadding(
-                  padding: const EdgeInsets.only(top: 16.0, bottom: 100.0),
-                  sliver: SliverGrid(
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      mainAxisSpacing: 16,
-                      crossAxisSpacing: 16,
-                    ),
-                    delegate: SliverChildBuilderDelegate(
-                      (context, index) {
-                        final reversedSessions = sessions.reversed.toList();
-                        final isLarge = index == 0;
-                        final duration = (reversedSessions[index].durationSeconds ~/ 60).toString();
-                        final title = reversedSessions[index].outputText.isEmpty ? 'Focus Session' : reversedSessions[index].outputText;
-                        return InkWell(
-                          onTap: () => ref.read(navigationProvider.notifier).state = 2,
-                          borderRadius: BorderRadius.circular(24),
-                          child: _buildFocusCard(context, duration, title, isLarge: isLarge),
-                        );
-                      },
-                      childCount: sessions.length > 4 ? 4 : sessions.length,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
       ),
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.only(bottom: 80.0),
-        child: FloatingActionButton.extended(
-          onPressed: () => Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const CreateFocusScreen()),
+    );
+  }
+
+      ),
+    );
+  }
+
+  void _showGoalDialog(BuildContext context, int currentGoal) {
+    int selectedGoal = currentGoal;
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: AppColors.cardBackground,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24), side: const BorderSide(color: AppColors.border)),
+        title: Text('Daily Focus Goal', style: GoogleFonts.playfairDisplay(color: Colors.white, fontWeight: FontWeight.bold)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text('How many minutes would you like to focus today?', 
+              style: GoogleFonts.inter(color: Colors.white70, fontSize: 14)),
+            const SizedBox(height: 24),
+            StatefulBuilder(
+              builder: (context, setModalState) {
+                return Column(
+                  children: [
+                    Text('$selectedGoal MINS', 
+                      style: GoogleFonts.playfairDisplay(color: AppColors.primary, fontSize: 32, fontWeight: FontWeight.bold)),
+                    Slider(
+                      value: selectedGoal.toDouble(),
+                      min: 30,
+                      max: 480,
+                      divisions: 15,
+                      activeColor: AppColors.primary,
+                      onChanged: (val) {
+                        setModalState(() => selectedGoal = val.toInt());
+                      },
+                    ),
+                  ],
+                );
+              }
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel', style: TextStyle(color: Colors.white54)),
           ),
-          backgroundColor: Colors.white,
-          foregroundColor: Colors.black,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(100)),
-          label: Row(
-            children: [
-              const Icon(Icons.add, size: 20),
-              const SizedBox(width: 8),
-              Text('New focus', style: GoogleFonts.inter(fontWeight: FontWeight.bold)),
-            ],
+          FilledButton(
+            onPressed: () {
+              ref.read(dailyGoalProvider.notifier).setGoal(selectedGoal);
+              Navigator.pop(context);
+            },
+            child: const Text('Set Goal'),
           ),
-        ).animate().scale(delay: 600.ms),
+        ],
       ),
     );
   }
@@ -163,6 +168,24 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget _buildPassiveBlockingCard(PassiveBlockingState passiveState) {
     return GestureDetector(
       onTap: () {
+        final blockedApps = ref.read(blockAppsProvider);
+        if (blockedApps.isEmpty) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Please select apps to block in Settings first.', 
+                style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
+              behavior: SnackBarBehavior.floating,
+              backgroundColor: AppColors.primary.withOpacity(0.9),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              action: SnackBarAction(
+                label: 'SETTINGS',
+                textColor: Colors.black,
+                onPressed: () => ref.read(navigationProvider.notifier).state = 3,
+              ),
+            ),
+          );
+          return;
+        }
         ref.read(passiveBlockingProvider.notifier).togglePassiveBlocking();
       },
       child: AnimatedContainer(
@@ -224,7 +247,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   Text(
                     passiveState.isActive
                         ? 'Blocking distractions • ${passiveState.todayPassiveMinutes}m today'
-                        : 'Tap to block apps in the background',
+                        : 'Tap to block selected apps. Go to Settings to manage blocked apps.',
                     style: GoogleFonts.inter(
                       color: passiveState.isActive ? AppColors.primary.withOpacity(0.7) : Colors.white38,
                       fontSize: 12,

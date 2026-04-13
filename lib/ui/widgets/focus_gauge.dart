@@ -11,7 +11,7 @@ class FocusGauge extends StatelessWidget {
   const FocusGauge({
     super.key,
     required this.currentMinutes,
-    this.goalMinutes = 240, // 4 hours goal
+    required this.goalMinutes,
   });
 
   @override
