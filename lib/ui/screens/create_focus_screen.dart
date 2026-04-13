@@ -8,6 +8,7 @@ import 'package:focus/core/theme.dart';
 import '../../features/focus/focus_provider.dart';
 import '../../features/dnd/dnd_service.dart';
 import 'session_screen.dart';
+import '../../features/dnd/block_apps_provider.dart';
 import '../widgets/global_donate_button.dart';
 
 class CreateFocusScreen extends ConsumerStatefulWidget {
@@ -97,7 +98,8 @@ class _CreateFocusScreenState extends ConsumerState<CreateFocusScreen> {
                         onPressed: () async {
                           final granted = await DndService.requestDndPermission(context);
                           if (granted) {
-                            await DndService.turnOnDnd();
+                            final blockedApps = ref.read(blockAppsProvider);
+                            await DndService.turnOnDnd(blockedApps);
                           }
                           ref.read(focusProvider.notifier).startSession(_selectedMinutes);
                           if (context.mounted) {

@@ -6,6 +6,7 @@ import '../../features/streak/streak_provider.dart';
 import '../../models/session.dart';
 import '../../core/theme.dart';
 import 'package:intl/intl.dart';
+import '../widgets/weekly_bar_chart.dart';
 
 class StatsScreen extends ConsumerWidget {
   const StatsScreen({super.key});
@@ -18,6 +19,17 @@ class StatsScreen extends ConsumerWidget {
     
     final successfulSessions = sessions.where((s) => s.status == SessionStatus.completed).length;
     final streak = ref.watch(streakProvider).currentStreak;
+
+    // Calculate daily minutes for the last 7 days
+    final now = DateTime.now();
+    final weekDays = List.generate(7, (i) => DateTime(now.year, now.month, now.day).subtract(Duration(days: 6 - i)));
+    
+    final dailyMinutes = weekDays.map((day) {
+      final dayEnd = day.add(const Duration(days: 1));
+      return sessions
+          .where((s) => s.startTime.isAfter(day) && s.startTime.isBefore(dayEnd))
+          .fold(0.0, (sum, s) => sum + (s.durationSeconds / 60));
+    }).toList();
 
     return Scaffold(
       appBar: AppBar(
@@ -43,9 +55,11 @@ class StatsScreen extends ConsumerWidget {
                   _MetricRow(
                     label1: 'STREAK',
                     value1: '$streak DAYS',
-                    label2: 'FAILED',
-                    value2: (sessions.length - successfulSessions).toString(),
+                    label2: 'COMPLETED',
+                    value2: successfulSessions.toString(),
                   ),
+                  const SizedBox(height: 24),
+                  WeeklyBarChart(dailyMinutes: dailyMinutes, weekDays: weekDays),
                 ],
               ).animate().fadeIn().slideY(begin: 0.1, end: 0),
             ),

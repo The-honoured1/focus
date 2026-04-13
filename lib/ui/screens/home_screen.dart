@@ -9,8 +9,8 @@ import '../../features/user/user_provider.dart';
 
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme.dart';
-import '../widgets/premium_background.dart';
 import 'create_focus_screen.dart';
+import '../widgets/focus_gauge.dart';
 import '../../features/navigation/navigation_provider.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
@@ -85,50 +85,55 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               slivers: [
                 SliverToBoxAdapter(
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
+                      const SizedBox(height: 20),
+                      Text(
+                        'FOCUS+',
+                        style: GoogleFonts.inter(
+                          color: AppColors.primary,
+                          fontSize: 12,
+                          letterSpacing: 8,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ).animate().fadeIn(),
                       const SizedBox(height: 12),
+                      
+                      FocusGauge(currentMinutes: ref.read(sessionHistoryProvider.notifier).getTodayFocusMinutes()),
+                      
+                      const SizedBox(height: 20),
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Row(
-                            children: [
-                              const Icon(Icons.local_fire_department, color: AppColors.primary, size: 24),
-                              const SizedBox(width: 4),
-                              Text('${streak.currentStreak}', style: GoogleFonts.inter(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
-                            ],
+                          Icon(Icons.local_fire_department, color: AppColors.primary, size: 20),
+                          const SizedBox(width: 8),
+                          Text(
+                            '${streak.currentStreak} DAY STREAK',
+                            style: GoogleFonts.inter(
+                              color: Colors.white70,
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 1,
+                            ),
                           ),
                         ],
-                      ).animate().fadeIn().slideX(begin: -0.2),
-                      const SizedBox(height: 40),
-                      Text(
-                        'Good morning,',
-                        style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                          fontWeight: FontWeight.normal,
-                          color: Colors.white70,
-                        ),
-                      ),
-                      Text(
-                        userName.isNotEmpty ? userName : 'Friend',
-                        style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                          fontSize: 40,
-                        ),
-                      ),
-                      const SizedBox(height: 32),
-                      
-
+                      ).animate().fadeIn(delay: 500.ms),
+                      const SizedBox(height: 48),
                     ],
                   ),
                 ),
                 
                 SliverToBoxAdapter(
                   child: Padding(
-                    padding: const EdgeInsets.only(bottom: 8.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text('Recent Sessions', style: GoogleFonts.inter(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-                      ],
+                    padding: const EdgeInsets.only(bottom: 16.0),
+                    child: Text(
+                      'RECENT SESSIONS', 
+                      style: GoogleFonts.inter(
+                        color: Colors.white24, 
+                        fontSize: 10, 
+                        letterSpacing: 2,
+                        fontWeight: FontWeight.bold
+                      )
                     ),
                   ),
                 ),
