@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme.dart';
-import 'stats_screen.dart';
 import 'block_apps_screen.dart';
 import 'about_screen.dart';
 import 'donate_screen.dart';
@@ -22,14 +21,6 @@ class SettingsScreen extends StatelessWidget {
         child: ListView(
           padding: const EdgeInsets.all(24.0),
           children: [
-            _buildSettingsItem(
-              context, 
-              icon: Icons.bar_chart_rounded, 
-              title: 'Statistics', 
-              subtitle: 'View your focus history and streaks',
-              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const StatsScreen())),
-            ),
-            const SizedBox(height: 16),
             _buildSettingsItem(
               context, 
               icon: Icons.block_flipped, 

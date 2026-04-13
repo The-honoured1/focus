@@ -25,10 +25,6 @@ class StatsScreen extends ConsumerWidget {
         title: Text('PERFORMANCE', style: Theme.of(context).textTheme.titleLarge?.copyWith(letterSpacing: 2)),
         backgroundColor: Colors.transparent,
         centerTitle: true,
-        leading: IconButton(
-          onPressed: () => Navigator.pop(context),
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
-        ),
       ),
       body: CustomScrollView(
         physics: const BouncingScrollPhysics(),

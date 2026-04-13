@@ -6,7 +6,7 @@ class DndService {
   static Future<bool> requestDndPermission(BuildContext context) async {
     if (Platform.isAndroid) {
       try {
-        final plugin = AppLimiterPlugin();
+        final plugin = AppLimiter();
         await plugin.requestAndroidPermission();
         return true;
       } catch (e) {
@@ -19,7 +19,7 @@ class DndService {
   static Future<void> turnOnDnd() async {
     if (Platform.isAndroid) {
       try {
-        final plugin = AppLimiterPlugin();
+        final plugin = AppLimiter();
         // The API signature requires passing the blocked packages or relying on state
         // Depending on specific plugin usage:
         // await plugin.blockAndroidApps(packageList); 
@@ -32,7 +32,7 @@ class DndService {
   static Future<void> turnOffDnd() async {
     if (Platform.isAndroid) {
       try {
-        final plugin = AppLimiterPlugin();
+        final plugin = AppLimiter();
         // await plugin.unBlockAndroidApps();
       } catch (e) {
         debugPrint('Failed to unblock apps: \$e');

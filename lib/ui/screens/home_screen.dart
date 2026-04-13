@@ -11,7 +11,6 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme.dart';
 import '../widgets/premium_background.dart';
 import 'create_focus_screen.dart';
-import 'settings_screen.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -89,33 +88,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     children: [
                       const SizedBox(height: 12),
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        mainAxisAlignment: MainAxisAlignment.end,
                         children: [
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.push(context, MaterialPageRoute(builder: (_) => const SettingsScreen()));
-                            },
-                            child: Container(
-                              padding: const EdgeInsets.all(4),
-                              decoration: const BoxDecoration(
-                                color: Colors.white,
-                                shape: BoxShape.circle,
-                              ),
-                              child: const Icon(Icons.menu_rounded, size: 16, color: Colors.black),
-                            ),
+                          Row(
+                            children: [
+                              const Icon(Icons.local_fire_department, color: AppColors.primary, size: 24),
+                              const SizedBox(width: 4),
+                              Text('${streak.currentStreak}', style: GoogleFonts.inter(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
+                            ],
                           ),
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.push(context, MaterialPageRoute(builder: (_) => const StatsScreen()));
-                            },
-                            child: Row(
-                              children: [
-                                const Icon(Icons.local_fire_department, color: AppColors.primary, size: 24),
-                                const SizedBox(width: 4),
-                                Text('${streak.currentStreak}', style: GoogleFonts.inter(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
-                              ],
-                            ),
-                          )
                         ],
                       ).animate().fadeIn().slideX(begin: -0.2),
                       const SizedBox(height: 40),
@@ -186,15 +167,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ),
 
                 SliverToBoxAdapter(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text('Recent Sessions', style: GoogleFonts.inter(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-                      TextButton(
-                        onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const StatsScreen())),
-                        child: Text('View Details', style: GoogleFonts.inter(color: AppColors.primary, fontSize: 14)),
-                      ),
-                    ],
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 8.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text('Recent Sessions', style: GoogleFonts.inter(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                      ],
+                    ),
                   ),
                 ),
                 SliverPadding(
@@ -222,22 +202,25 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const CreateFocusScreen()),
-        ),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(100)),
-        label: Row(
-          children: [
-            const Icon(Icons.add, size: 20),
-            const SizedBox(width: 8),
-            Text('New focus', style: GoogleFonts.inter(fontWeight: FontWeight.bold)),
-          ],
-        ),
-      ).animate().scale(delay: 600.ms),
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(bottom: 80.0),
+        child: FloatingActionButton.extended(
+          onPressed: () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const CreateFocusScreen()),
+          ),
+          backgroundColor: Colors.white,
+          foregroundColor: Colors.black,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(100)),
+          label: Row(
+            children: [
+              const Icon(Icons.add, size: 20),
+              const SizedBox(width: 8),
+              Text('New focus', style: GoogleFonts.inter(fontWeight: FontWeight.bold)),
+            ],
+          ),
+        ).animate().scale(delay: 600.ms),
+      ),
     );
   }
 

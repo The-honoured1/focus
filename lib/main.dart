@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/theme.dart';
 import 'services/hive_service.dart';
-import 'ui/screens/home_screen.dart';
+import 'ui/screens/main_layout_screen.dart';
 import 'features/focus/lifecycle_observer.dart';
 
 import 'ui/widgets/global_donate_button.dart';
@@ -52,7 +52,7 @@ class _FocusPlusAppState extends ConsumerState<FocusPlusApp> {
           child: child ?? const SizedBox(),
         );
       },
-      home: const HomeScreen(),
+      home: const MainLayoutScreen(),
     );
   }
 }
