@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import '../../features/focus/focus_provider.dart';
+
 import '../../features/focus/session_history_provider.dart';
 import '../../features/streak/streak_provider.dart';
 import '../../features/dnd/passive_blocking_provider.dart';
 
-import '../../features/user/user_provider.dart';
 
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme.dart';
@@ -31,7 +30,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final userName = ref.watch(userProvider);
+
     final streak = ref.watch(streakProvider);
     final sessions = ref.watch(sessionHistoryProvider);
     final passiveState = ref.watch(passiveBlockingProvider);

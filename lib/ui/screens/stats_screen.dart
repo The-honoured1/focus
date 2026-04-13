@@ -4,7 +4,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import '../../features/focus/session_history_provider.dart';
 import '../../features/streak/streak_provider.dart';
 import '../../features/dnd/passive_blocking_provider.dart';
-import '../../models/session.dart';
+
 import '../../core/theme.dart';
 import 'package:intl/intl.dart';
 import '../widgets/weekly_bar_chart.dart';
