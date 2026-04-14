@@ -22,9 +22,6 @@ class DndService {
   static Future<void> turnOnDnd(List<String> blockedPackages) async {
     if (Platform.isAndroid) {
       try {
-        final plugin = AppLimiter();
-        await plugin.blocAndroidApp();
-        
         await _channel.invokeMethod('startStrictBlock', {'packages': blockedPackages});
       } catch (e) {
         debugPrint('Failed to block apps: $e');
@@ -35,9 +32,6 @@ class DndService {
   static Future<void> turnOffDnd() async {
     if (Platform.isAndroid) {
       try {
-        final plugin = AppLimiter();
-        await plugin.unblocAndroidApp();
-        
         await _channel.invokeMethod('stopStrictBlock');
       } catch (e) {
         debugPrint('Failed to unblock apps: $e');

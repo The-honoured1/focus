@@ -33,15 +33,15 @@ class FocusGauge extends StatelessWidget {
             children: [
               // Outer Glow
               Container(
-                width: size + 20,
-                height: size + 20,
+                width: size + 10,
+                height: size + 10,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: AppColors.primary.withOpacity(0.05),
-                      blurRadius: 50,
-                      spreadRadius: 10,
+                      color: AppColors.primary.withOpacity(0.03),
+                      blurRadius: 20,
+                      spreadRadius: 2,
                     ),
                   ],
                 ),
@@ -53,9 +53,9 @@ class FocusGauge extends StatelessWidget {
                 height: size,
                 child: CircularProgressIndicator(
                   value: progress,
-                  strokeWidth: showInfo ? 4 : 3,
+                  strokeWidth: showInfo ? 3 : 2,
                   color: AppColors.primary,
-                  backgroundColor: Colors.white.withOpacity(0.05),
+                  backgroundColor: Colors.white.withOpacity(0.03),
                   strokeCap: StrokeCap.round,
                 ),
               ),
@@ -68,26 +68,29 @@ class FocusGauge extends StatelessWidget {
                     Text(
                       'FOCUS TODAY',
                       style: GoogleFonts.inter(
-                        color: Colors.white24,
+                        color: Colors.white38,
                         fontSize: size * 0.05,
                         letterSpacing: 2,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   if (showInfo) const SizedBox(height: 8),
                   Text(
                     '$currentMinutes',
-                    style: GoogleFonts.playfairDisplay(
+                    style: GoogleFonts.inter(
                       color: Colors.white,
-                      fontSize: size * 0.24,
-                      fontWeight: FontWeight.bold,
+                      fontSize: size * 0.28,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: -1,
                     ),
                   ),
                   Text(
                     'MINS',
                     style: GoogleFonts.inter(
-                      color: Colors.white54,
+                      color: Colors.white60,
                       fontSize: size * 0.06,
-                      fontWeight: FontWeight.w500,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1,
                     ),
                   ),
                 ],

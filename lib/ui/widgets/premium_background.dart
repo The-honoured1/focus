@@ -50,13 +50,13 @@ class CurvePainter extends CustomPainter {
       ));
 
     // Drawing with low opacity glowing lines
-    paint.color = AppColors.primary.withOpacity(0.05);
+    paint.color = AppColors.primary.withOpacity(0.02);
     canvas.drawPath(path1, paint);
     
-    paint.color = AppColors.accent.withOpacity(0.03);
+    paint.color = AppColors.accent.withOpacity(0.012);
     canvas.drawPath(path2, paint);
     
-    paint.color = AppColors.primary.withOpacity(0.02);
+    paint.color = AppColors.primary.withOpacity(0.008);
     canvas.drawPath(path3, paint);
   }
 

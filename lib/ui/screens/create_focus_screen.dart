@@ -87,49 +87,59 @@ class _CreateFocusScreenState extends ConsumerState<CreateFocusScreen> {
                           ),
                           
                           // Action Buttons
-                          Row(
-                            children: [
-                              Expanded(
-                                child: OutlinedButton(
-                                  onPressed: () async {
-                                    final granted = await DndService.requestDndPermission(context);
-                                    if (granted) {
-                                      final blockedApps = ref.read(blockAppsProvider);
-                                      await DndService.turnOnDnd(blockedApps);
-                                    }
-                                    ref.read(focusProvider.notifier).startSession(_selectedMinutes);
-                                    if (context.mounted) {
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 24),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: OutlinedButton(
+                                    onPressed: () async {
+                                      final granted = await DndService.requestDndPermission(context);
+                                      if (granted) {
+                                        final blockedApps = ref.read(blockAppsProvider);
+                                        await DndService.turnOnDnd(blockedApps);
+                                      }
+                                      ref.read(focusProvider.notifier).startSession(_selectedMinutes);
+                                      if (context.mounted) {
+                                        Navigator.pushReplacement(
+                                          context,
+                                          MaterialPageRoute(builder: (context) => const SessionScreen()),
+                                        );
+                                      }
+                                    },
+                                    style: OutlinedButton.styleFrom(
+                                      padding: const EdgeInsets.symmetric(vertical: 16),
+                                      side: BorderSide(color: AppColors.primary.withOpacity(0.3)),
+                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                    ),
+                                    child: FittedBox(
+                                      child: Text(
+                                        'DEEP FOCUS',
+                                        style: GoogleFonts.inter(
+                                          color: AppColors.primary, 
+                                          fontWeight: FontWeight.bold, 
+                                          fontSize: 12,
+                                          letterSpacing: 1,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: FilledButton(
+                                    onPressed: () {
+                                      ref.read(focusProvider.notifier).startSession(_selectedMinutes);
                                       Navigator.pushReplacement(
                                         context,
                                         MaterialPageRoute(builder: (context) => const SessionScreen()),
                                       );
-                                    }
-                                  },
-                                  style: OutlinedButton.styleFrom(
-                                    padding: const EdgeInsets.symmetric(vertical: 20),
-                                    side: const BorderSide(color: Colors.white24),
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(100)),
-                                  ),
-                                  child: Text(
-                                    'Deep Focus (DND)',
-                                    style: GoogleFonts.inter(color: AppColors.primary, fontWeight: FontWeight.bold, fontSize: 13),
+                                    },
+                                    child: const Text('CONTINUE'),
                                   ),
                                 ),
-                              ),
-                              const SizedBox(width: 16),
-                              Expanded(
-                                child: FilledButton(
-                                  onPressed: () {
-                                    ref.read(focusProvider.notifier).startSession(_selectedMinutes);
-                                    Navigator.pushReplacement(
-                                      context,
-                                      MaterialPageRoute(builder: (context) => const SessionScreen()),
-                                    );
-                                  },
-                                  child: const Text('Continue'),
-                                ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ).animate().fadeIn(delay: 400.ms),
                           
                           const SizedBox(height: 20),

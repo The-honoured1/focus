@@ -2,16 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AppColors {
-  static const Color background = Color(0xFF000000);
-  static const Color primary = Color(0xFFD2FF55); // Vibrant Lime
-  static const Color primaryGlow = Color(0x33D2FF55);
-  static const Color accent = Color(0xFF55FFD2); // Minty Blue for gradient
-  static const Color error = Color(0xFFFF3B3B);
+  static const Color background = Color(0xFF0D0D0D); // Slightly elevated black
+  static const Color primary = Color(0xFF94A684); // Muted Sage Green
+  static const Color primaryGlow = Color(0x1A94A684); // Reduced opacity glow
+  static const Color accent = Color(0xFF7A8D91); // Soft Slate Blue
+  static const Color error = Color(0xFFFF5252);
   static const Color text = Colors.white;
-  static const Color textSecondary = Color(0xFF808080);
-  static const Color cardBackground = Color(0xFF1A1A1A);
-  static const Color glassBackground = Color(0x0DFFFFFF);
-  static const Color border = Color(0xFF262626);
+  static const Color textSecondary = Color(0xFFA0A0A0);
+  static const Color cardBackground = Color(0xFF161616);
+  static const Color glassBackground = Color(0x08FFFFFF);
+  static const Color border = Color(0xFF222222);
 }
 
 class AppTheme {
@@ -28,11 +28,12 @@ class AppTheme {
         surface: AppColors.cardBackground,
       ),
       textTheme: TextTheme(
-        headlineLarge: GoogleFonts.playfairDisplay(
+        headlineLarge: GoogleFonts.inter(
           color: AppColors.text, 
           fontWeight: FontWeight.bold,
+          letterSpacing: -1.0,
         ),
-        headlineMedium: GoogleFonts.playfairDisplay(
+        headlineMedium: GoogleFonts.inter(
           color: AppColors.text, 
           fontWeight: FontWeight.bold,
         ),
@@ -46,18 +47,19 @@ class AppTheme {
       ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
-          backgroundColor: Colors.white,
+          backgroundColor: AppColors.primary,
           foregroundColor: Colors.black,
-          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(100)),
-          textStyle: GoogleFonts.inter(fontWeight: FontWeight.bold),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          textStyle: GoogleFonts.inter(fontWeight: FontWeight.w600),
+          elevation: 0,
         ),
       ),
       cardTheme: CardThemeData(
         color: AppColors.cardBackground,
         elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(20),
           side: const BorderSide(color: AppColors.border, width: 1),
         ),
       ),
@@ -66,7 +68,7 @@ class AppTheme {
 
   static BoxDecoration glassDecoration = BoxDecoration(
     color: AppColors.glassBackground,
-    borderRadius: BorderRadius.circular(24),
+    borderRadius: BorderRadius.circular(20),
     border: Border.all(color: AppColors.border, width: 1),
   );
 

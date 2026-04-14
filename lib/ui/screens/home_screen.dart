@@ -102,35 +102,44 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              _getGreeting(),
-              style: GoogleFonts.inter(
-                color: Colors.white54,
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                _getGreeting(),
+                style: GoogleFonts.inter(
+                  color: Colors.white54,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                  letterSpacing: 0.5,
+                ),
               ),
-            ),
-            Text(
-              name.isNotEmpty ? name : 'Focus Friend',
-              style: GoogleFonts.playfairDisplay(
-                color: Colors.white,
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  name.isNotEmpty ? name : 'Focus Friend',
+                  style: GoogleFonts.inter(
+                    color: Colors.white,
+                    fontSize: 24,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: -0.5,
+                  ),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
+        const SizedBox(width: 16),
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.05),
+            color: Colors.white.withOpacity(0.03),
             shape: BoxShape.circle,
             border: Border.all(color: AppColors.border),
           ),
-          child: Icon(Icons.person_outline, color: AppColors.primary, size: 24),
+          child: Icon(Icons.person_outline, color: AppColors.textSecondary, size: 20),
         ),
       ],
     ).animate().fadeIn().slideX(begin: -0.1, end: 0);
@@ -140,17 +149,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return GestureDetector(
       onTap: () => _showGoalDialog(context, goal),
       child: Container(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(20),
         decoration: AppTheme.glassDecoration,
         child: Row(
           children: [
             FocusGauge(
               currentMinutes: current,
               goalMinutes: goal,
-              size: 100,
+              size: 80,
               showInfo: false,
             ),
-            const SizedBox(width: 24),
+            const SizedBox(width: 20),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -158,31 +167,34 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   Text(
                     'DAILY PROGRESS',
                     style: GoogleFonts.inter(
-                      color: AppColors.primary,
-                      fontSize: 10,
+                      color: AppColors.primary.withOpacity(0.8),
+                      fontSize: 9,
                       fontWeight: FontWeight.bold,
-                      letterSpacing: 1.5,
+                      letterSpacing: 1.2,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      '$current / $goal mins',
+                      style: GoogleFonts.inter(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 8),
-                  Text(
-                    '$current / $goal mins',
-                    style: GoogleFonts.inter(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
                   Row(
                     children: [
-                      Icon(Icons.local_fire_department, color: AppColors.primary, size: 16),
+                      Icon(Icons.local_fire_department, color: AppColors.primary, size: 14),
                       const SizedBox(width: 4),
                       Text(
                         '$streak DAY STREAK',
                         style: GoogleFonts.inter(
-                          color: Colors.white70,
-                          fontSize: 11,
+                          color: Colors.white60,
+                          fontSize: 10,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -191,10 +203,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ],
               ),
             ),
-            Icon(Icons.chevron_right, color: Colors.white24),
+            Icon(Icons.chevron_right, color: Colors.white12),
           ],
         ),
-      ).animate().fadeIn(delay: 200.ms).scale(begin: const Offset(0.95, 0.95), end: const Offset(1, 1)),
+      ).animate().fadeIn(delay: 200.ms).scale(begin: const Offset(0.98, 0.98), end: const Offset(1, 1)),
     );
   }
 
@@ -297,51 +309,38 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       ),
       child: Container(
         width: double.infinity,
-        padding: const EdgeInsets.all(32),
+        padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 24),
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              AppColors.primary.withOpacity(0.15),
-              AppColors.accent.withOpacity(0.05),
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-          borderRadius: BorderRadius.circular(32),
-          border: Border.all(color: AppColors.primary.withOpacity(0.3)),
+          color: AppColors.cardBackground,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: AppColors.border),
         ),
         child: Column(
           children: [
             Container(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: AppColors.primary,
+                color: AppColors.primary.withOpacity(0.1),
                 shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: AppColors.primary.withOpacity(0.3),
-                    blurRadius: 20,
-                    spreadRadius: 5,
-                  ),
-                ],
               ),
-              child: const Icon(Icons.play_arrow_rounded, color: Colors.black, size: 32),
+              child: Icon(Icons.play_arrow_rounded, color: AppColors.primary, size: 28),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 16),
             Text(
-              'Ready to focus?',
-              style: GoogleFonts.playfairDisplay(
+              'READY TO FOCUS?',
+              style: GoogleFonts.inter(
                 color: Colors.white,
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
+                fontSize: 14,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 1,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 4),
             Text(
               'Start a deep work session now',
               style: GoogleFonts.inter(
-                color: Colors.white54,
-                fontSize: 14,
+                color: Colors.white38,
+                fontSize: 12,
               ),
             ),
           ],
