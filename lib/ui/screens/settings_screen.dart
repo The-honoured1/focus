@@ -4,7 +4,6 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../core/theme.dart';
 import 'block_apps_screen.dart';
 import 'about_screen.dart';
-import 'donate_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -37,15 +36,7 @@ class SettingsScreen extends StatelessWidget {
               subtitle: 'App version and developer info',
               onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AboutScreen())),
             ),
-            const SizedBox(height: 16),
-            _buildSettingsItem(
-              context, 
-              icon: Icons.volunteer_activism_rounded, 
-              title: 'Support the Developer', 
-              subtitle: 'Help keep this app ad-free',
-              iconColor: AppColors.primary,
-              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const DonateScreen())),
-            ),
+
             const SizedBox(height: 16),
             _buildSettingsItem(
               context, 
