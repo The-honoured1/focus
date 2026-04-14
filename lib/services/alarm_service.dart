@@ -1,8 +1,9 @@
+import 'dart:io';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest_all.dart' as tz;
-import 'dart:io';
 
 class AlarmService {
   static final FlutterLocalNotificationsPlugin _notificationsPlugin = FlutterLocalNotificationsPlugin();
@@ -33,13 +34,19 @@ class AlarmService {
     );
 
     if (Platform.isAndroid) {
-      await _notificationsPlugin
+      final androidPlugin = _notificationsPlugin
           .resolvePlatformSpecificImplementation<
-              AndroidFlutterLocalNotificationsPlugin>()
-          ?.requestNotificationsPermission();
+              AndroidFlutterLocalNotificationsPlugin>();
+
+      // Request notification permission (Android 13+)
+      await androidPlugin?.requestNotificationsPermission();
+
+      // Request exact alarm permission (Android 12+)
+      await androidPlugin?.requestExactAlarmsPermission();
     }
   }
 
+  /// Schedule an alarm for a task reminder at a specific time
   static Future<void> scheduleAlarm(String id, String title, DateTime dateTime) async {
     final now = DateTime.now();
     if (dateTime.isBefore(now)) return;
@@ -50,7 +57,7 @@ class AlarmService {
         AndroidNotificationDetails(
       'focus_alarm_channel',
       'Focus Alarms',
-      channelDescription: 'Channel for Focus+ task alarms',
+      channelDescription: 'Channel for Focus+ task alarms and reminders',
       importance: Importance.max,
       priority: Priority.high,
       fullScreenIntent: true,
@@ -58,6 +65,7 @@ class AlarmService {
       category: AndroidNotificationCategory.alarm,
       playSound: true,
       enableVibration: true,
+      vibrationPattern: Int64List.fromList([0, 500, 200, 500, 200, 500]),
     );
 
     const DarwinNotificationDetails iOSPlatformChannelSpecifics =
@@ -76,13 +84,55 @@ class AlarmService {
 
     await _notificationsPlugin.zonedSchedule(
       id.hashCode,
-      'Task Reminder',
+      '⏰ Task Reminder',
       title,
       scheduleTime,
       platformChannelSpecifics,
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
       uiLocalNotificationDateInterpretation:
           UILocalNotificationDateInterpretation.absoluteTime,
+    );
+  }
+
+  /// Show an immediate notification when a focus session completes
+  static Future<void> showSessionCompleteNotification({
+    required int minutes,
+    bool isSuccess = true,
+  }) async {
+    const AndroidNotificationDetails androidDetails =
+        AndroidNotificationDetails(
+      'focus_session_channel',
+      'Focus Sessions',
+      channelDescription: 'Notifications when focus sessions complete',
+      importance: Importance.max,
+      priority: Priority.high,
+      playSound: true,
+      enableVibration: true,
+      vibrationPattern: Int64List.fromList([0, 800, 300, 800, 300, 800]),
+      category: AndroidNotificationCategory.alarm,
+      fullScreenIntent: true,
+      audioAttributesUsage: AudioAttributesUsage.alarm,
+    );
+
+    const DarwinNotificationDetails iosDetails = DarwinNotificationDetails(
+      presentAlert: true,
+      presentBadge: true,
+      presentSound: true,
+      sound: 'default',
+    );
+
+    const NotificationDetails details = NotificationDetails(
+      android: androidDetails,
+      iOS: iosDetails,
+    );
+
+    await _notificationsPlugin.show(
+      9999, // Fixed ID for session notifications
+      isSuccess ? '🎉 Focus Complete!' : '⏱️ Session Ended',
+      isSuccess
+          ? 'Amazing! You focused for $minutes minutes. Keep the streak going!'
+          : 'You focused for $minutes minutes. Every bit counts!',
+      details,
     );
   }
 
