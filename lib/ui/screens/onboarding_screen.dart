@@ -57,9 +57,11 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                   final page = _pages[index];
                   return Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 40.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
+                    child: Center(
+                      child: SingleChildScrollView(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
                         Container(
                           padding: const EdgeInsets.all(30),
                           decoration: BoxDecoration(
@@ -109,9 +111,11 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                         ],
                       ],
                     ),
-                  );
-                },
-              ),
+                  ),
+                ),
+              );
+            },
+          ),
             ),
             Padding(
               padding: const EdgeInsets.all(40.0),

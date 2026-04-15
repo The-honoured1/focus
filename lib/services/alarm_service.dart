@@ -53,7 +53,7 @@ class AlarmService {
 
     final scheduleTime = tz.TZDateTime.from(dateTime, tz.local);
 
-    const AndroidNotificationDetails androidPlatformChannelSpecifics =
+    final AndroidNotificationDetails androidPlatformChannelSpecifics =
         AndroidNotificationDetails(
       'focus_alarm_channel',
       'Focus Alarms',
@@ -77,7 +77,7 @@ class AlarmService {
       categoryIdentifier: 'alarm_category',
     );
 
-    const NotificationDetails platformChannelSpecifics = NotificationDetails(
+    final NotificationDetails platformChannelSpecifics = NotificationDetails(
       android: androidPlatformChannelSpecifics,
       iOS: iOSPlatformChannelSpecifics,
     );
@@ -99,7 +99,7 @@ class AlarmService {
     required int minutes,
     bool isSuccess = true,
   }) async {
-    const AndroidNotificationDetails androidDetails =
+    final AndroidNotificationDetails androidDetails =
         AndroidNotificationDetails(
       'focus_session_channel',
       'Focus Sessions',
@@ -121,7 +121,7 @@ class AlarmService {
       sound: 'default',
     );
 
-    const NotificationDetails details = NotificationDetails(
+    final NotificationDetails details = NotificationDetails(
       android: androidDetails,
       iOS: iosDetails,
     );

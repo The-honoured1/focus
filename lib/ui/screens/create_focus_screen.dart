@@ -18,7 +18,7 @@ class CreateFocusScreen extends ConsumerStatefulWidget {
 }
 
 class _CreateFocusScreenState extends ConsumerState<CreateFocusScreen> {
-  final TextEditingController _nameController = TextEditingController(text: 'Read Game of thrones');
+  final TextEditingController _nameController = TextEditingController();
   int _selectedMinutes = 60;
 
   @override

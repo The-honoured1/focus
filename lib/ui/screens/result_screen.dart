@@ -9,6 +9,7 @@ import '../../models/session.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme.dart';
 import '../widgets/premium_background.dart';
+import 'main_layout_screen.dart';
 
 class ResultScreen extends ConsumerStatefulWidget {
   const ResultScreen({super.key});
@@ -52,7 +53,10 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
 
   void _finish() {
     ref.read(focusProvider.notifier).reset();
-    Navigator.of(context).popUntil((route) => route.isFirst);
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (context) => const MainLayoutScreen()),
+      (route) => false,
+    );
   }
 
   @override

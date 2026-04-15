@@ -27,9 +27,11 @@ class SessionScreen extends ConsumerWidget {
     final minutes = (focusState.remainingSeconds ~/ 60).toString().padLeft(2, '0');
     final seconds = (focusState.remainingSeconds % 60).toString().padLeft(2, '0');
 
-    return WillPopScope(
-      onWillPop: () async {
-        final confirmed = await showDialog<bool>(
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (didPop) async {
+        if (didPop) return;
+        await showDialog<bool>(
           context: context,
           builder: (context) => AlertDialog(
             backgroundColor: AppColors.cardBackground,
@@ -49,7 +51,6 @@ class SessionScreen extends ConsumerWidget {
             ],
           ),
         );
-        return confirmed ?? false;
       },
       child: Scaffold(
         body: PremiumBackground(
