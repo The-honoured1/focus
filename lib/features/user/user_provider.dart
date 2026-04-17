@@ -4,19 +4,25 @@ import 'package:shared_preferences/shared_preferences.dart';
 class UserState {
   final String name;
   final bool hasSeenOnboarding;
+  final bool isLoading;
 
-  UserState({required this.name, required this.hasSeenOnboarding});
+  UserState({
+    required this.name,
+    required this.hasSeenOnboarding,
+    this.isLoading = false,
+  });
 
-  UserState copyWith({String? name, bool? hasSeenOnboarding}) {
+  UserState copyWith({String? name, bool? hasSeenOnboarding, bool? isLoading}) {
     return UserState(
       name: name ?? this.name,
       hasSeenOnboarding: hasSeenOnboarding ?? this.hasSeenOnboarding,
+      isLoading: isLoading ?? this.isLoading,
     );
   }
 }
 
 class UserNotifier extends StateNotifier<UserState> {
-  UserNotifier() : super(UserState(name: '', hasSeenOnboarding: false)) {
+  UserNotifier() : super(UserState(name: '', hasSeenOnboarding: false, isLoading: true)) {
     _loadUser();
   }
 
@@ -24,7 +30,7 @@ class UserNotifier extends StateNotifier<UserState> {
     final prefs = await SharedPreferences.getInstance();
     final name = prefs.getString('user_name') ?? '';
     final hasSeenOnboarding = prefs.getBool('has_seen_onboarding') ?? false;
-    state = UserState(name: name, hasSeenOnboarding: hasSeenOnboarding);
+    state = UserState(name: name, hasSeenOnboarding: hasSeenOnboarding, isLoading: false);
   }
 
   Future<void> completeOnboarding() async {

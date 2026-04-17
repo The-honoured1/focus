@@ -65,7 +65,9 @@ class _FocusPlusAppState extends ConsumerState<FocusPlusApp> {
 
   @override
   Widget build(BuildContext context) {
-    if (!_isInitialized) {
+    final userState = ref.watch(userProvider);
+
+    if (!_isInitialized || userState.isLoading) {
       return MaterialApp(
         debugShowCheckedModeBanner: false,
         theme: AppTheme.darkTheme,
@@ -73,14 +75,11 @@ class _FocusPlusAppState extends ConsumerState<FocusPlusApp> {
       );
     }
 
-    final userState = ref.watch(userProvider);
-    final hasSeenOnboarding = userState.hasSeenOnboarding;
-
     return MaterialApp(
       title: 'Focus+',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.darkTheme,
-      home: hasSeenOnboarding ? const MainLayoutScreen() : const OnboardingScreen(),
+      home: userState.hasSeenOnboarding ? const MainLayoutScreen() : const OnboardingScreen(),
     );
   }
 }

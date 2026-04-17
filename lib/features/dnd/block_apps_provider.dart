@@ -30,4 +30,15 @@ class BlockAppsNotifier extends StateNotifier<List<String>> {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setStringList(_key, current);
   }
+
+  static const List<String> doomScrollingApps = [
+    'com.zhiliaoapp.musically', // TikTok
+    'com.instagram.android',    // Instagram
+    'com.google.android.youtube', // YouTube (Shorts)
+    'com.twitter.android',      // Twitter/X
+    'com.facebook.katana',      // Facebook
+    'com.reddit.frontpage',     // Reddit
+    'com.snapchat.android',     // Snapchat
+    'com.pinterest',            // Pinterest
+  ];
 }

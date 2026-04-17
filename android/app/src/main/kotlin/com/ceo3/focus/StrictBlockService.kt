@@ -25,6 +25,10 @@ class StrictBlockService : Service() {
     private var handler: Handler? = null
     private var runnable: Runnable? = null
     private var blockedPackages = setOf<String>()
+    private var mode: String = "deep"
+    
+    private var countdownValue = 5
+    private var dismissButton: TextView? = null
 
     companion object {
         const val CHANNEL_ID = "StrictBlockChannel"
@@ -38,27 +42,107 @@ class StrictBlockService : Service() {
         super.onCreate()
         isRunning = true
         windowManager = getSystemService(Context.WINDOW_SERVICE) as WindowManager
-        createOverlayView()
         createNotificationChannel()
     }
 
     private fun createOverlayView() {
         val root = FrameLayout(this)
-        root.setBackgroundColor(Color.parseColor("#121212"))
+        root.setBackgroundColor(Color.parseColor("#121212")) // Default dark
         
+        val container = android.widget.LinearLayout(this)
+        container.orientation = android.widget.LinearLayout.VERTICAL
+        container.gravity = Gravity.CENTER
+        
+        val titleView = TextView(this)
+        titleView.text = if (mode == "doom") "MINDFUL INTERVENTION" else "DEEP FOCUS ACTIVE"
+        titleView.setTextColor(Color.parseColor("#64B5F6")) // Light blue accent
+        titleView.textSize = 14f
+        titleView.letterSpacing = 0.2f
+        titleView.gravity = Gravity.CENTER
+        container.addView(titleView)
+
+        val spacing1 = View(this)
+        container.addView(spacing1, FrameLayout.LayoutParams(10, 40))
+
         val textView = TextView(this)
-        textView.text = "FOCUS MODE ACTIVE\n\nThis app is restricted."
+        textView.text = if (mode == "doom") 
+            "Is this scroll worth\nyour time?" 
+            else "This app is restricted\nfor your focus."
         textView.setTextColor(Color.WHITE)
         textView.gravity = Gravity.CENTER
-        textView.textSize = 24f
+        textView.textSize = 28f
+        textView.setTypeface(null, android.graphics.Typeface.BOLD)
+        container.addView(textView)
+
+        val spacing2 = View(this)
+        container.addView(spacing2, FrameLayout.LayoutParams(10, 60))
+
+        if (mode == "doom") {
+            val subText = TextView(this)
+            subText.text = "Take a breath. Reconnect."
+            subText.setTextColor(Color.parseColor("#80FFFFFF"))
+            subText.gravity = Gravity.CENTER
+            subText.textSize = 16f
+            container.addView(subText)
+
+            val spacing3 = View(this)
+            container.addView(spacing3, FrameLayout.LayoutParams(10, 80))
+
+            dismissButton = TextView(this)
+            updateCountdownButton()
+            dismissButton?.setTextColor(Color.WHITE)
+            dismissButton?.setBackgroundColor(Color.parseColor("#1AFFFFFF"))
+            dismissButton?.setPadding(60, 30, 60, 30)
+            dismissButton?.gravity = Gravity.CENTER
+            dismissButton?.setOnClickListener {
+                if (countdownValue <= 0) {
+                    hideOverlay()
+                }
+            }
+            container.addView(dismissButton)
+            
+            startCountdown()
+        } else {
+            val subText = TextView(this)
+            subText.text = "Finish your goal first."
+            subText.setTextColor(Color.parseColor("#80FFFFFF"))
+            subText.gravity = Gravity.CENTER
+            subText.textSize = 16f
+            container.addView(subText)
+        }
         
         val lp = FrameLayout.LayoutParams(
-            FrameLayout.LayoutParams.WRAP_CONTENT,
+            FrameLayout.LayoutParams.MATCH_PARENT,
             FrameLayout.LayoutParams.WRAP_CONTENT,
             Gravity.CENTER
         )
-        root.addView(textView, lp)
+        root.addView(container, lp)
         overlayView = root
+    }
+
+    private fun startCountdown() {
+        countdownValue = 5
+        val countdownHandler = Handler(Looper.getMainLooper())
+        val countdownRunnable = object : Runnable {
+            override fun run() {
+                if (countdownValue > 0) {
+                    countdownValue--
+                    updateCountdownButton()
+                    countdownHandler.postDelayed(this, 1000)
+                }
+            }
+        }
+        countdownHandler.post(countdownRunnable)
+    }
+
+    private fun updateCountdownButton() {
+        if (countdownValue > 0) {
+            dismissButton?.text = "WAIT $countdownValue..."
+            dismissButton?.alpha = 0.5f
+        } else {
+            dismissButton?.text = "I REALLY NEED TO USE THIS"
+            dismissButton?.alpha = 1.0f
+        }
     }
 
     private fun createNotificationChannel() {
@@ -72,10 +156,13 @@ class StrictBlockService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         val packages = intent?.getStringArrayExtra("packages")?.toSet() ?: emptySet()
         blockedPackages = packages
+        mode = intent?.getStringExtra("mode") ?: "deep"
+
+        createOverlayView()
 
         val notification = NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle("Focus Mode Active")
-            .setContentText("Blocking restricted apps...")
+            .setContentTitle(if (mode == "doom") "Anti-Doom Scrolling Active" else "Deep Focus Active")
+            .setContentText("Helping you stay focused...")
             .setSmallIcon(android.R.drawable.ic_dialog_info)
             .build()
             
@@ -125,12 +212,14 @@ class StrictBlockService : Service() {
                 WindowManager.LayoutParams.MATCH_PARENT,
                 WindowManager.LayoutParams.MATCH_PARENT,
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY else WindowManager.LayoutParams.TYPE_PHONE,
-                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+                0, // Removed NOT_FOCUSABLE to allow button clicks
                 PixelFormat.TRANSLUCENT
             )
+            params.gravity = Gravity.CENTER
             try {
                 windowManager?.addView(overlayView, params)
                 isOverlayDisplayed = true
+                if (mode == "doom") startCountdown()
             } catch (e: Exception) {}
         }
     }
