@@ -7,6 +7,7 @@ import '../../core/theme.dart';
 import '../../features/app_limiter/app_limits_provider.dart';
 import '../../features/app_limiter/app_usage_provider.dart';
 import '../../features/app_limiter/app_limiter_service.dart';
+import '../../models/app_limit.dart';
 
 class AppLimiterScreen extends ConsumerStatefulWidget {
   const AppLimiterScreen({super.key});
@@ -143,7 +144,6 @@ class _AppLimiterScreenState extends ConsumerState<AppLimiterScreen> {
                 isEnabled: true,
               );
               ref.read(appLimitsProvider.notifier).addOrUpdateLimit(appLimit);
-              AppLimiterService.setAppLimit(appInfo.packageName ?? '', limit);
               Navigator.pop(context);
             },
             child: const Text('Set Limit'),
@@ -234,8 +234,11 @@ class _AppLimiterScreenState extends ConsumerState<AppLimiterScreen> {
                                       ),
                                       if (limit != null && limit.isEnabled)
                                         Text(
-                                          'Limit: ${_formatDuration(limit.dailyLimit)}',
-                                          style: GoogleFonts.inter(color: AppColors.primary, fontSize: 12),
+                                          'Limit: ${_formatDuration(limit.dailyLimit)} ${usedDuration > limit.dailyLimit ? '(Exceeded!)' : ''}',
+                                          style: GoogleFonts.inter(
+                                            color: usedDuration > limit.dailyLimit ? Colors.red : AppColors.primary,
+                                            fontSize: 12,
+                                          ),
                                         ),
                                     ],
                                   ),
