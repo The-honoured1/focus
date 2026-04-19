@@ -26,6 +26,8 @@ class StrictBlockService : Service() {
     private var runnable: Runnable? = null
     private var blockedPackages = setOf<String>()
     private var mode: String = "deep"
+    private var lastForegroundPackage: String? = null
+    private var lastCheckTime: Long = 0L
 
     companion object {
         const val CHANNEL_ID = "StrictBlockChannel"
@@ -112,7 +114,9 @@ class StrictBlockService : Service() {
         blockedPackages = packages
         mode = intent?.getStringExtra("mode") ?: "deep"
 
-        createOverlayView()
+        if (overlayView == null) {
+            createOverlayView()
+        }
 
         val notification = NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle(if (mode == "doom") "Anti-Doom Scrolling Active" else "Deep Focus Active")
@@ -121,7 +125,10 @@ class StrictBlockService : Service() {
             .build()
             
         startForeground(NOTIFICATION_ID, notification)
-        startLoop()
+        
+        if (runnable == null) {
+            startLoop()
+        }
         
         return START_STICKY
     }
@@ -144,20 +151,27 @@ class StrictBlockService : Service() {
     private fun isBlockedAppInForeground(): Boolean {
         val usageStatsManager = getSystemService(Context.USAGE_STATS_SERVICE) as UsageStatsManager
         val endTime = System.currentTimeMillis()
-        val beginTime = endTime - 1000 * 5 
+        if (lastCheckTime == 0L) {
+            lastCheckTime = endTime - 1000 * 60 * 60 // 1 hour ago
+        }
+        val beginTime = lastCheckTime
 
         val usageEvents = usageStatsManager.queryEvents(beginTime, endTime)
-        var lastPackage: String? = null
         val event = UsageEvents.Event()
         
         while (usageEvents.hasNextEvent()) {
             usageEvents.getNextEvent(event)
             if (event.eventType == UsageEvents.Event.MOVE_TO_FOREGROUND) {
-                lastPackage = event.packageName
+                lastForegroundPackage = event.packageName
+            } else if (event.eventType == UsageEvents.Event.MOVE_TO_BACKGROUND) {
+                if (event.packageName == lastForegroundPackage) {
+                    lastForegroundPackage = null
+                }
             }
         }
         
-        return blockedPackages.contains(lastPackage)
+        lastCheckTime = endTime
+        return blockedPackages.contains(lastForegroundPackage)
     }
 
     private fun showOverlay() {

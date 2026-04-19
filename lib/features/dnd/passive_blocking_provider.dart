@@ -34,6 +34,12 @@ class PassiveBlockingNotifier extends StateNotifier<PassiveBlockingState> {
 
   PassiveBlockingNotifier(this._ref) : super(PassiveBlockingState()) {
     _loadState();
+
+    _ref.listen<List<String>>(blockAppsProvider, (previous, next) {
+      if (state.isActive) {
+        DndService.turnOnDnd(next);
+      }
+    });
   }
 
   Future<void> _loadState() async {

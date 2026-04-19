@@ -7,6 +7,7 @@ import 'home_screen.dart';
 import 'stats_screen.dart';
 import 'settings_screen.dart';
 import 'tasks_screen.dart';
+import 'app_limiter_screen.dart';
 import '../../features/dnd/dnd_service.dart';
 import '../../features/navigation/navigation_provider.dart';
 

@@ -70,8 +70,6 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  }
-
   Widget _buildSettingsItem(BuildContext context, {required IconData icon, required String title, required String subtitle, required VoidCallback onTap, Color? iconColor}) {
     return InkWell(
       onTap: onTap,

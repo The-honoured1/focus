@@ -12,7 +12,8 @@ final appListProvider = FutureProvider<List<AppInfo>>((ref) async {
 
 final appIconProvider = FutureProvider.family<Uint8List?, String>((ref, packageName) async {
   try {
-    return await InstalledApps.getAppIcon(packageName);
+    final appInfo = await InstalledApps.getAppInfo(packageName, null);
+    return appInfo?.icon;
   } catch (e) {
     return null;
   }
